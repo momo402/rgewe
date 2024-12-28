@@ -1,0 +1,13 @@
+version: '3.8'
+
+services:
+  gewe:
+    image: ghcr.io/momo402/rgewe:1.0
+    container_name: rgewe
+    privileged: true
+    ports:
+      - "2531:2531"
+      - "2532:2532"
+    volumes:
+      - "${HOME}/Rust/rgewe/temp:/root/temp"
+    restart: always
