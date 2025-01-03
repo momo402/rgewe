@@ -1,12 +1,14 @@
 use rgewe_api::api;
 #[tokio::test]
-async fn test_bare_get() {
-    assert!(api::bare_get().await.is_ok());
+async fn test_get_ip() {
+    let fu = api::test_get_ip();
+    assert!(fu.await.is_ok());
 }
 
 #[tokio::test]
 async fn test_get_token() {
-    let ret = api::get_token().await.unwrap();
+    let c = api::ApiClientBuilder::new().build();
+    let ret = c.get_token().await.unwrap();
     println!("{:#?}", ret);
     let token = ret.get("data").unwrap().to_string();
     assert!(!token.is_empty());
@@ -14,7 +16,18 @@ async fn test_get_token() {
 
 #[tokio::test]
 async fn test_get_profile() {
-    let ret = api::get_profile("").await.unwrap();
+    let no_token_c = api::ApiClientBuilder::new().build();
+    let token = no_token_c
+        .get_token()
+        .await
+        .unwrap()
+        .get("data")
+        .unwrap()
+        .to_string();
+
+    let with_token_c = api::ApiClientBuilder::new().with_token(&token).build();
+    let ret = with_token_c.get_profile("need_app_id").await.unwrap();
     println!("{:#?}", ret);
-    ret.get("data").unwrap().to_string();
+    let data = ret.get("data").unwrap().to_string();
+    println!("{:#?}", data);
 }
